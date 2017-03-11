@@ -133,4 +133,12 @@ class CategoryController extends Controller
             ->getForm()
         ;
     }
+    /**
+     * @Route("/{id}", name="category_slug")
+     * @Method({"GET", "POST"})
+     */
+    public function getSlug()
+  {
+    return Jobeet::slugify($this->getName());
+  }
 }

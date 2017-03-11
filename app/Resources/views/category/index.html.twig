@@ -27,6 +27,12 @@
                     </ul>
                 </td>
             </tr>
+            {% if category.morejobs %}
+            <div class="more_jobs">
+              and <a href="{{ path('EnsJobeetBundle_category', { 'slug': category.slug }) }}">{{ category.morejobs }}</a>
+              more...
+            </div>
+          {% endif %}
         {% endfor %}
         </tbody>
     </table>

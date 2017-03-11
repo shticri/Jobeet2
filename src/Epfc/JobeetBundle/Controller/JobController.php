@@ -10,7 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component
 /**
  * Job controller.
  *
- * @Route("job")
+ * @Route("/")
  */
 class JobController extends Controller
 {
@@ -23,12 +23,27 @@ class JobController extends Controller
     public function indexAction()
     {
         $em = $this->getDoctrine()->getManager();
-
-        $jobs = $em->getRepository('JobeetBundle:Job')->findAll();
-
-        return $this->render('job/index.html.twig', array(
-            'jobs' => $jobs,
+        $categories = $em->getRepository('JobeetBundle:Category')->getWithJobs();
+        foreach($categories as $category)
+        {
+            $category->setActiveJobs($em->getRepository('JobeetBundle:Job')
+                    ->getActiveJobs($category->getId(), $this->container
+                    ->getParameter('max_jobs_on_homepage')));
+            
+            $category->setMoreJobs($em->getRepository('JobeetBundle:Job')
+                    ->countActiveJobs($category->getId()) - $this->container
+                    ->getParameter('max_jobs_on_homepage'));
+            
+                
+        }
+        return $this->render('JobeetBundle:Job:index.html.twig', array(
+        'categories' => $categories
         ));
+//        $jobs = $em->getRepository('JobeetBundle:Job')->findAll();
+//
+//        return $this->render('job/index.html.twig', array(
+//            'jobs' => $jobs,
+//        ));
     }
 
     /**

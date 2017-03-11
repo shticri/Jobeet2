@@ -25,6 +25,7 @@ class Category
      * @ORM\OneToMany(targetEntity="Job", mappedBy="category")
      */
     private $jobs;
+    private $more_jobs;
 
     public function __construct()
     {
@@ -102,6 +103,20 @@ class Category
     
      public function __toString() {
         return $this->name.".";
+    }
+    
+    /**
+     * 
+     * @param type $jobs
+     */
+    public function setMoreJobs($jobs)
+    {
+      $this->more_jobs = $jobs >=  0 ? $jobs : 0;
+    }
+
+    public function getMoreJobs()
+    {
+      return $this->more_jobs;
     }
 }
 
