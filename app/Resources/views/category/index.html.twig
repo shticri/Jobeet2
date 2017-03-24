@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('public/css/main.css') }}" type="text/css" media="all" />
+{% endblock %}
+
+{#{% block content%}
+    <h1>Categories list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for category in categories %}
+            <tr>
+                <td><a href="{{ path('category_show', { 'id': category.id }) }}">{{ category.id }}</a></td>
+                <td>{{ category.name }}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('category_show', { 'id': category.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('category_edit', { 'id': category.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('category_new') }}">Create a new category</a>
+        </li>
+    </ul>
+{% endblock %} #}
+
+{% block content %}
+    <div id="categories">
+      <table class="categories">
+        {% for category in categories %}
+          <tr class="{{ cycle(['even', 'odd'], loop.index) }}">
+            <td>
+              <a href="{{ path('category_show', { 'id': category.id }) }}">
+                {{ category.name }}
+              </a>
+            </td>
+            
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+{% endblock %}
