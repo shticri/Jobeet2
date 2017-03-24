@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Affiliates list</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Url</th>
+                <th>Email</th>
+                <th>Token</th>
+                <th>Isactive</th>
+                <th>Createdat</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for affiliate in affiliates %}
+            <tr>
+                <td><a href="{{ path('affiliate_show', { 'id': affiliate.id }) }}">{{ affiliate.id }}</a></td>
+                <td>{{ affiliate.url }}</td>
+                <td>{{ affiliate.email }}</td>
+                <td>{{ affiliate.token }}</td>
+                <td>{% if affiliate.isActive %}Yes{% else %}No{% endif %}</td>
+                <td>{% if affiliate.createdAt %}{{ affiliate.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
+                <td>
+                    <ul>
+                        <li>
+                            <a href="{{ path('affiliate_show', { 'id': affiliate.id }) }}">show</a>
+                        </li>
+                        <li>
+                            <a href="{{ path('affiliate_edit', { 'id': affiliate.id }) }}">edit</a>
+                        </li>
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <ul>
+        <li>
+            <a href="{{ path('affiliate_new') }}">Create a new affiliate</a>
+        </li>
+    </ul>
+{% endblock %}
