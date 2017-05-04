@@ -31,7 +31,7 @@ class CategoryType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'jobeetbundle_category';
+        return 'epfc_jobeetbundle_category';
     }
 
 

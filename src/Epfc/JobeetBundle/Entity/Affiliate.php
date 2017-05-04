@@ -4,35 +4,17 @@ namespace Epfc\JobeetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Affiliate
  *
  * @ORM\Table(name="affiliate")
  * @ORM\Entity(repositoryClass="Epfc\JobeetBundle\Repository\AffiliateRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Affiliate
 {
-    function getCategory() {
-        return $this->category;
-    }
-
-    function setCategory($category) {
-        $this->category = $category;
-        return $this;
-    }
-
-        /**
-     * Many Users have Many Groups.
-     * @ORM\ManyToMany(targetEntity="Category", inversedBy="affiliates")
-     * @ORM\JoinTable(name="CategoryAffiliate")
-     */
-    private $category;
-
-    public function __construct() {
-        $this->categoriy = new ArrayCollection();
-    }
-    
     /**
      * @var int
      *
@@ -52,7 +34,8 @@ class Affiliate
     /**
      * @var string
      *
-     * @ORM\Column(name="email", type="string", length=255)
+     * @ORM\Column(name="email", type="string", length=255, unique=true)
+     * @Assert\NotBlank()
      */
     private $email;
 
@@ -66,7 +49,8 @@ class Affiliate
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_active", type="boolean", nullable=true)
+     * @ORM\Column(name="is_active", type="boolean")
+     * 
      */
     private $isActive;
 
@@ -207,12 +191,64 @@ class Affiliate
     {
         return $this->createdAt;
     }
+    
+     /**
+     * Many Affiliates have Many Categories.
+     * @ORM\ManyToMany(targetEntity="Category", inversedBy="affiliates")
+     * @ORM\JoinTable(name="categoryaffiliate")
+     */
+    private $category;
+
+    public function __construct() {
+        $this->category = new ArrayCollection();
+    }
+    
+    function getCategory() {
+        return $this->category;
+    }
+
+    function setCategory($category) {
+        $this->category = $category;
+        return $this;
+    }
+    
     /**
      * @ORM\PrePersist()
      */
     public function setCreatedAtValue()
     {
-      $this->created_at = new \DateTime();
+      $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * @ORM\PrePersist()
+     */
+    public function setTokenValue()
+    {
+        if(!$this->getToken()) {
+            $token = sha1($this->getEmail().rand(11111, 99999));
+            $this->token = $token;
+        }
+ 
+        return $this;
+    }
+
+     public function activate()
+    {
+        if(!$this->getIsActive()) {
+            $this->setIsActive(true);
+        }
+ 
+        return $this->isActive;
+    }
+ 
+    public function deactivate()
+    {
+        if($this->getIsActive()) {
+            $this->setIsActive(false);
+        }
+ 
+        return $this->isActive;
     }
 }
 

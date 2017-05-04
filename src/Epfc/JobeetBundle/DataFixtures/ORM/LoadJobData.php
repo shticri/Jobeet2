@@ -45,10 +45,70 @@ class LoadJobData extends AbstractFixture implements OrderedFixtureInterface
     $job_extreme_sensio->setExpiresAt(new \DateTime('2019-10-10'));
     $job_extreme_sensio->setCreatedAt(new \DateTime());    
  
+    $job_expired = new Job();
+    $job_expired->setCategory($em->merge($this->getReference('category-programming')));
+    $job_expired->setType('full-time');
+    $job_expired->setCompany('Sensio Labs');
+    $job_expired->setLogo('sensio-labs.gif');
+    $job_expired->setUrl('http://www.sensiolabs.com/');
+    $job_expired->setPosition('Web Developer Expired');
+    $job_expired->setLocation('Paris, France');
+    $job_expired->setDescription('Lorem ipsum dolor sit amet, consectetur adipisicing elit.');
+    $job_expired->setHowToApply('Send your resume to lorem.ipsum [at] dolor.sit');
+    $job_expired->setIsPublic(true);
+    $job_expired->setIsActivated(true);
+    $job_expired->setToken('job_expired');
+    $job_expired->setEmail('job@example.com');
+    $job_expired->setExpiresAt(new \DateTime('2006-12-10'));
+    $job_expired->setCreatedAt(new \DateTime('2005-12-01'));
+    
+    $job_sensio = new Job();
+    $job_sensio->setCategory($em->merge($this->getReference('category-design')));
+    $job_sensio->setType('full-time');
+    $job_sensio->setCompany('Extreme Sensio');
+    $job_sensio->setLogo('extreme-sensio.gif');
+    $job_sensio->setUrl('http://www.extreme-sensio.com/');
+    $job_sensio->setPosition('Junior Web Designer');
+    $job_sensio->setLocation('Lille, France');
+    $job_sensio->setDescription('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in.');
+    $job_sensio->setHowToApply('Send your resume to fabien.potencier [at] sensio.com');
+    $job_sensio->setIsPublic(true);
+    $job_sensio->setIsActivated(true);
+    $job_sensio->setToken('job_sensio');
+    $job_sensio->setEmail('job@exam.com');
+    $job_sensio->setExpiresAt(new \DateTime('2019-12-10'));
+    $job_sensio->setCreatedAt(new \DateTime());  
+    
     $em->persist($job_sensio_labs);
     $em->persist($job_extreme_sensio);
- 
+    $em->persist($job_expired);
+    $em->persist($job_sensio);
+    
     $em->flush();
+    
+    //.....dynamiques
+    for($i = 100; $i <= 130; $i++)
+    {
+      $job = new Job();
+      $job->setCategory($em->merge($this->getReference('category-programming')));
+      $job->setType('full-time');
+      $job->setCompany('Company '.$i);
+      $job->setPosition('Web Developer');
+      $job->setLocation('Paris, France');
+      $job->setDescription('Lorem ipsum dolor sit amet, consectetur adipisicing elit.');
+      $job->setHowToApply('Send your resume to lorem.ipsum [at] dolor.sit');
+      $job->setIsPublic(true);
+      $job->setIsActivated(true);
+      $job->setToken('job_'.$i);
+      $job->setEmail('job@example.com');
+      $job->setExpiresAt(new \DateTime('2019-12-10'));
+      $job->setCreatedAt(new \DateTime()); 
+
+      $em->persist($job);
+    }
+
+    $em->flush();
+  
   }
  
   public function getOrder()

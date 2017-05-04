@@ -5,7 +5,8 @@ namespace Epfc\JobeetBundle\Controller;
 use Epfc\JobeetBundle\Entity\Affiliate;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Affiliate controller.
@@ -32,28 +33,74 @@ class AffiliateController extends Controller
     }
 
     /**
-     * Creates a new affiliate entity.
+     * Displays a form to create a new Affiliate entity.
      *
      * @Route("/new", name="affiliate_new")
-     * @Method({"GET", "POST"})
+     * @Method({"GET"})
      */
     public function newAction(Request $request)
     {
         $affiliate = new Affiliate();
         $form = $this->createForm('Epfc\JobeetBundle\Form\AffiliateType', $affiliate);
-        $form->handleRequest($request);
+        /*$form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($affiliate);
-            $em->flush($affiliate);
+            $em->flush();
 
             return $this->redirectToRoute('affiliate_show', array('id' => $affiliate->getId()));
-        }
+        }*/
 
         return $this->render('affiliate/new.html.twig', array(
             'affiliate' => $affiliate,
             'form' => $form->createView(),
+        ));
+    }
+
+    /**
+     * Displays a message.
+     *
+     * @Route("/wait", name="affiliate_wait")
+     * @Method({"GET"})
+     */
+    public function waitAction()
+    {
+        return $this->render('affiliate/wait.html.twig');
+    }
+
+    /**
+     * Creates a new affiliate entity.
+     *
+     * @Route("/create", name="affiliate_create")
+     * @Method({"POST"})
+     */
+    public function createAction(Request $request)
+    {
+        $affiliate = new Affiliate();
+        $form = $this->createForm('Epfc\JobeetBundle\Form\AffiliateType', $affiliate);
+        $form->handleRequest($request);
+        //$em = $this->getDoctrine()->getManager();
+ 
+        if ($form->isValid()) {
+            
+            $em = $this->getDoctrine()->getManager();
+            dump($request);die; // totu bine, insa nu avem is-active
+
+            $formData = $request->get('affiliate');
+            $affiliate->setUrl($formData['url']);
+            $affiliate->setEmail($formData['email']);
+            $affiliate->setIsActive(false);
+ 
+            $em->persist($affiliate);
+            $em->flush();
+ 
+            return $this->redirectToRoute('affiliate_wait');
+        }
+ 
+        return $this->render('affiliate/new.html.twig', array(
+            'entity' => $affiliate,
+            'form'   => $form->createView(),
         ));
     }
 

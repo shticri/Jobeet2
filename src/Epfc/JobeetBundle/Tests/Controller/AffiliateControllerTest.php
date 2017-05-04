@@ -19,7 +19,7 @@ class AffiliateControllerTest extends WebTestCase
 
         // Fill in the form and submit it
         $form = $crawler->selectButton('Create')->form(array(
-            'jobeetbundle_affiliate[field_name]'  => 'Test',
+            'epfc_jobeetbundle_affiliate[field_name]'  => 'Test',
             // ... other fields to fill
         ));
 
@@ -33,7 +33,7 @@ class AffiliateControllerTest extends WebTestCase
         $crawler = $client->click($crawler->selectLink('Edit')->link());
 
         $form = $crawler->selectButton('Update')->form(array(
-            'jobeetbundle_affiliate[field_name]'  => 'Foo',
+            'epfc_jobeetbundle_affiliate[field_name]'  => 'Foo',
             // ... other fields to fill
         ));
 
