@@ -3,21 +3,20 @@
 namespace Epfc\JobeetBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Epfc\JobeetBundle\Utils\Jobeet as Jobeet;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Job
  *
  * @ORM\Table(name="job")
  * @ORM\Entity(repositoryClass="Epfc\JobeetBundle\Repository\JobRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class Job
 {
-    
-    /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="jobs")
-     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
-     */
-    private $category;
     
     /**
      * @var int
@@ -28,25 +27,11 @@ class Job
      */
     private $id;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="category_id", type="integer")
-     */
-    private $categoryId;
-    function getCategory() {
-        return $this->category;
-    }
-
-    function setCategory($category) {
-        $this->category = $category;
-        return $this;
-    }
-
-        /**
+     /**
      * @var string
      *
      * @ORM\Column(name="type", type="string", length=255, nullable=true)
+     * @Assert\NotBlank()
      */
     private $type;
 
@@ -54,6 +39,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="company", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $company;
 
@@ -75,6 +61,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="position", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $position;
 
@@ -82,6 +69,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="location", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $location;
 
@@ -89,6 +77,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="description", type="text")
+     * @Assert\NotBlank()
      */
     private $description;
 
@@ -96,6 +85,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="how_to_apply", type="text")
+     * @Assert\NotBlank()
      */
     private $howToApply;
 
@@ -124,6 +114,7 @@ class Job
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255)
+     * @Assert\NotBlank()
      */
     private $email;
 
@@ -144,11 +135,41 @@ class Job
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="updated_at", type="datetime")
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      */
     private $updatedAt;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="jobs")
+     * @ORM\JoinColumn(name="category_id", referencedColumnName="id")
+     * @Assert\NotBlank()
+     */
+    private $category;
+    
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="category_id", type="integer")
+     */
+    private $categoryId;
+    
+    /**
+     * 
+     * @Assert\Image()
+     *     
+    */
+    private $file;
+    
+    function getFile() {
+        return $this->file;
+    }
 
+    function setFile(UploadedFile $file) {
+        $this->file = $file;
+        return $this;
+    }
+
+        
     /**
      * Get id
      *
@@ -157,30 +178,6 @@ class Job
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * Set categoryId
-     *
-     * @param integer $categoryId
-     *
-     * @return Job
-     */
-    public function setCategoryId($categoryId)
-    {
-        $this->categoryId = $categoryId;
-
-        return $this;
-    }
-
-    /**
-     * Get categoryId
-     *
-     * @return int
-     */
-    public function getCategoryId()
-    {
-        return $this->categoryId;
     }
 
     /**
@@ -543,6 +540,40 @@ class Job
         return $this->updatedAt;
     }
     
+    function getCategory() {
+        return $this->category;
+    }
+
+    function setCategory($category) {
+        $this->category = $category;
+        return $this;
+    }
+    
+    /**
+     * Set categoryId
+     *
+     * @param integer $categoryId
+     *
+     * @return Job
+     */
+    public function setCategoryId($categoryId)
+    {
+        $this->categoryId = $categoryId;
+
+        return $this;
+    }
+
+    /**
+     * Get categoryId
+     *
+     * @return int
+     */
+    public function getCategoryId()
+    {
+        return $this->categoryId;
+    }
+
+    
     /**
      * @ORM\PrePersist()
      */
@@ -550,7 +581,7 @@ class Job
     {
       if(!$this->getCreatedAt())
       {
-        $this->created_at = new \DateTime();
+        $this->createdAt = new \DateTime();
       }
     }
     /**
@@ -558,7 +589,177 @@ class Job
      */
     public function setUpdatedAtValue()
     {
-      $this->updated_at = new \DateTime();
+      $this->updatedAt = new \DateTime();
     }    
+    
+    /**
+     * @ORM\PrePersist()
+     */
+    public function setExpiresAtValue()
+    {
+      if(!$this->getExpiresAt())
+      {
+        $now = $this->getCreatedAt() ? $this->getCreatedAt()->format('U') : time();
+        $this->expiresAt = new \DateTime(date('Y-m-d H:i:s', $now + 86400 * 30));
+      }
+    }
+    
+    public function getCompanySlug()
+    {
+        return Jobeet::slugify($this->getCompany());
+    }
+ 
+    public function getPositionSlug()
+    {
+        return Jobeet::slugify($this->getPosition());
+    }
+ 
+    public function getLocationSlug()
+    {
+        return Jobeet::slugify($this->getLocation());
+    }
+    
+    public static function getTypes()
+    {
+      return array('Full time'=>'full-time', 'Part time'=>'part-time' ,'Freelance'=> 'freelance');
+    }
+
+    public static function getTypesValues()
+    {
+      return array_values(self::getTypes());
+    }
+    
+    /**
+     * 
+     * @Assert\Callback
+     */
+    public function validate(ExecutionContextInterface $context, $payload)
+    {
+        if (!in_array($this->getType(), $this->getTypesValues())) {
+            $context->buildViolation('Fait pas l\'type!')
+                ->atPath('type')
+                ->addViolation();
+            
+        }
+    }
+    
+    protected function getUploadDir()
+    {
+        return 'public/uploads/jobs';
+    }
+
+    protected function getUploadRootDir()
+    {
+        // aici salveaza fisierul imagine logo
+        return __DIR__.'/../../../../web/'.$this->getUploadDir();
+    }
+
+    public function getWebPath()
+    {
+        return null === $this->logo ? null : $this->getUploadDir().'/'.$this->logo;
+    }
+
+    public function getAbsolutePath()
+    {
+        return null === $this->logo ? null : $this->getUploadRootDir().'/'.$this->logo;
+    }
+    
+    /**
+    * @ORM\prePersist
+    */
+    public function preUpload()
+    {
+      if (null !== $this->file) {
+        // do whatever you want to generate a unique name
+        $this->logo = md5(uniqid()) . $this->file->getClientOriginalName();
+      }
+    }
+
+    /**
+    * @ORM\postPersist
+    */
+    public function upload()
+    {
+      if (null === $this->file) {
+        return;
+      }
+
+      // if there is an error when moving the file, an exception will
+      // be automatically thrown by move(). This will properly prevent
+      // the entity from being persisted to the database on error
+      $this->file->move($this->getUploadRootDir(), $this->logo);
+
+      unset($this->file);
+    }
+
+    /**
+    * @ORM\postRemove
+    */
+    public function removeUpload()
+    {
+      if ($file = $this->getAbsolutePath()) {
+        unlink($file);
+      }
+    }
+    
+    /**
+    * @ORM\prePersist
+    */
+    public function setTokenValue()
+    {
+      if(!$this->getToken())
+      {
+        $this->token = sha1($this->getEmail().rand(11111, 99999));
+      }
+    }
+    
+    public function isExpired()
+    {
+      return $this->getDaysBeforeExpires() < 0;
+    }
+
+    public function expiresSoon()
+    {
+      return $this->getDaysBeforeExpires() < 5;
+    }
+
+    public function getDaysBeforeExpires()
+    {
+      return ceil(($this->getExpiresAt()->format('U') - time()) / 86400);
+    }
+    
+    public function publish()
+    {
+      $this->setIsActivated(true);
+    }
+    
+    public function extend()
+    {
+      if (!$this->expiresSoon())
+      {
+        return false;
+      }
+
+      $this->expiresAt = new \DateTime(date('Y-m-d H:i:s', time() + 86400 * 30));
+
+      return true;
+    }
+
+
+    public function asArray($host)
+    {
+        return array(
+            'category'     => $this->getCategory()->getName(),
+            'type'         => $this->getType(),
+            'company'      => $this->getCompany(),
+            'logo'         => $this->getLogo() ? 'http://' . $host . '/uploads/jobs/' . $this->getLogo() : null,
+            'url'          => $this->getUrl(),
+            'position'     => $this->getPosition(),
+            'location'     => $this->getLocation(),
+            'description'  => $this->getDescription(),
+            'how_to_apply' => $this->getHowToApply(),
+            'expires_at'   => $this->getCreatedAt()->format('Y-m-d H:i:s'),
+        );
+    }
 }
 

@@ -13,7 +13,7 @@ class AffiliateType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('url')->add('email')->add('token')->add('isActive')->add('createdAt')->add('category');
+        $builder->add('url')->add('email')->add('category')->add('isActive');
     }
     
     /**
@@ -31,7 +31,7 @@ class AffiliateType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return 'jobeetbundle_affiliate';
+        return 'epfc_jobeetbundle_affiliate';
     }
 
 

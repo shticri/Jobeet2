@@ -5,7 +5,8 @@ namespace Epfc\JobeetBundle\Controller;
 use Epfc\JobeetBundle\Entity\Category;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Category controller.
@@ -46,7 +47,7 @@ class CategoryController extends Controller
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->persist($category);
-            $em->flush($category);
+            $em->flush();
 
             return $this->redirectToRoute('category_show', array('id' => $category->getId()));
         }
@@ -60,16 +61,38 @@ class CategoryController extends Controller
     /**
      * Finds and displays a category entity.
      *
-     * @Route("/{id}", name="category_show")
+     * @Route("/{slug}/{page}", name="category_show")
      * @Method("GET")
      */
-    public function showAction(Category $category)
+    public function showAction($slug, $page = 1, Request $request)
     {
-        $deleteForm = $this->createDeleteForm($category);
+        $em = $this->getDoctrine()->getManager();
+
+        $category = $em->getRepository('JobeetBundle:Category')->findOneBySlug($slug);
+        
+        if (!$category) {
+            throw $this->createNotFoundException('Unable to find Category entity.');
+        }
+        
+        $total_jobs = $em->getRepository('JobeetBundle:Job')->countActiveJobs($category->getId());
+        $jobs_per_page = $this->container->getParameter('max_jobs_on_category');
+        $last_page = ceil($total_jobs / $jobs_per_page);
+        $previous_page = $page > 1 ? $page - 1 : 1;
+        $next_page = $page < $last_page ? $page + 1 : $last_page;
+        
+        $category->setActiveJobs($em->getRepository('JobeetBundle:Job')->getActiveJobs($category->getId(), $jobs_per_page, ($page - 1) * $jobs_per_page));
+        //$category->setMoreJobs($total_jobs, $this->container->getParameter('max_jobs_on_homepage'));
+        
+        $format = $request->getRequestFormat();
 
         return $this->render('category/show.html.twig', array(
             'category' => $category,
-            'delete_form' => $deleteForm->createView(),
+            'last_page' => $last_page,
+            'previous_page' => $previous_page,
+            'current_page' => $page,
+            'next_page' => $next_page,
+            'total_jobs' => $total_jobs,
+            'feedId' => sha1($this->get('router')->generate('category_show', array('slug' =>  $category->getSlug(), '_format' => 'atom'), true))
         ));
     }
 
@@ -133,12 +156,4 @@ class CategoryController extends Controller
             ->getForm()
         ;
     }
-    /**
-     * @Route("/{id}", name="category_slug")
-     * @Method({"GET", "POST"})
-     */
-    public function getSlug()
-  {
-    return Jobeet::slugify($this->getName());
-  }
 }
