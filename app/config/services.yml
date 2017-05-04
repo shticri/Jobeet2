@@ -7,3 +7,21 @@ services:
     #service_name:
     #    class: AppBundle\Directory\ClassName
     #    arguments: ['@another_service_name', 'plain_value', '%parameter_name%']
+    
+    epfc.jobeet.admin.category:
+        class: Epfc\JobeetBundle\Admin\CategoryAdmin
+        arguments: [~, Epfc\JobeetBundle\Entity\Category, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Category }
+            
+    epfc.jobeet.admin.job:
+        class: Epfc\JobeetBundle\Admin\JobAdmin
+        arguments: [~, Epfc\JobeetBundle\Entity\Job, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Jobs }
+       
+    epfc.jobeet.admin.affiliate:
+        class: Epfc\JobeetBundle\Admin\AffiliateAdmin
+        arguments: [~, Epfc\JobeetBundle\Entity\Affiliate, ~]
+        tags:
+            - { name: sonata.admin, manager_type: orm, label: Affiliates }

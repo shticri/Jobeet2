@@ -1,69 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <h1>Jobs list</h1>
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="stylesheet" href="{{ asset('public/css/jobs.css') }}" type="text/css" media="all" />
+{% endblock %}
 
-    <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Categoryid</th>
-                <th>Type</th>
-                <th>Company</th>
-                <th>Logo</th>
-                <th>Url</th>
-                <th>Position</th>
-                <th>Location</th>
-                <th>Description</th>
-                <th>Howtoapply</th>
-                <th>Token</th>
-                <th>Ispublic</th>
-                <th>Isactivated</th>
-                <th>Email</th>
-                <th>Expiresat</th>
-                <th>Createdat</th>
-                <th>Updatedat</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for job in jobs %}
-            <tr>
-                <td><a href="{{ path('job_show', { 'id': job.id }) }}">{{ job.id }}</a></td>
-                <td>{{ job.categoryId }}</td>
-                <td>{{ job.type }}</td>
-                <td>{{ job.company }}</td>
-                <td>{{ job.logo }}</td>
-                <td>{{ job.url }}</td>
-                <td>{{ job.position }}</td>
-                <td>{{ job.location }}</td>
-                <td>{{ job.description }}</td>
-                <td>{{ job.howToApply }}</td>
-                <td>{{ job.token }}</td>
-                <td>{% if job.isPublic %}Yes{% else %}No{% endif %}</td>
-                <td>{% if job.isActivated %}Yes{% else %}No{% endif %}</td>
-                <td>{{ job.email }}</td>
-                <td>{% if job.expiresAt %}{{ job.expiresAt|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if job.createdAt %}{{ job.createdAt|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>{% if job.updatedAt %}{{ job.updatedAt|date('Y-m-d H:i:s') }}{% endif %}</td>
-                <td>
-                    <ul>
-                        <li>
-                            <a href="{{ path('job_show', { 'id': job.id }) }}">show</a>
-                        </li>
-                        <li>
-                            <a href="{{ path('job_edit', { 'id': job.id }) }}">edit</a>
-                        </li>
-                    </ul>
-                </td>
-            </tr>
+{% block content %}
+    <div id="jobs">
+        {% for category in categories %}
+        <div>
+            <div class="category_{{ category.slug }}">
+                <div class="feed">
+                    <a href="{{ path('category_show', { 'slug': category.slug, '_format': 'atom' }) }}">Feed</a>
+                </div>
+                <h1><a href="{{ path('category_show', { 'slug': category.slug }) }}">{{ category.name }}</a></h1>
+            
+            
+            {% include 'job/list.html.twig' with {'jobs': category.activejobs} %}
+            
+            {% if category.morejobs %}
+                <div class="more_jobs">
+                  and <a href="{{ path('category_show', { 'slug': category.slug }) }}">{{ category.morejobs }}</a>
+                  more...
+                </div>
+            {% endif %}
+            </div>
+        </div>
         {% endfor %}
-        </tbody>
-    </table>
-
-    <ul>
-        <li>
-            <a href="{{ path('job_new') }}">Create a new job</a>
-        </li>
-    </ul>
+    </div>
 {% endblock %}

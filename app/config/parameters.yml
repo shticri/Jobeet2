@@ -7,6 +7,6 @@ parameters:
     database_password: root
     mailer_transport: smtp
     mailer_host: 127.0.0.1
-    mailer_user: null
-    mailer_password: null
-    secret: ThisTokenIsNotSoSecretChangeIt
+    mailer_user: shticri@yahoo.com
+    mailer_password: lavinia
+    secret: sq2342fhg2384732fkkfgh56hh

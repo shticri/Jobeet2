@@ -1,6 +1,6 @@
 <?php
 
-namespace JobeetBundle\Tests\Controller;
+namespace Epfc\JobeetBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
